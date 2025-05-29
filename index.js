@@ -19,6 +19,12 @@ showTimeSelector(bot);
 handleReminders(bot);
 cleanOldRecords();
 // Ловимо помилки
+require("http")
+  .createServer((req, res) => {
+    res.writeHead(200);
+    res.end("I'm alive!");
+  })
+  .listen(process.env.PORT || 3000);
 bot.on("polling_error", (error) => {
   console.error(
     "Polling error:",

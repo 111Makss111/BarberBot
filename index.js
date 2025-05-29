@@ -24,9 +24,27 @@ showTimeSelector(bot);
 handleReminders(bot);
 cleanOldRecords();
 // Ловимо помилки
+const express = require("express");
+const bodyParser = require("body-parser");
+
+const app = express(); // Ось тут створюється змінна app
+
 const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+
+// Приклад обробки webhook запиту
+app.post("/webhook", (req, res) => {
+  console.log("Отримано повідомлення від Telegram:", req.body);
+  res.sendStatus(200);
+});
+
+app.get("/", (req, res) => {
+  res.send("Бот працює!");
+});
+
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+  console.log(`Сервер запущено на порту ${PORT}`);
 });
 
 // bot.on("polling_error", (error) => {

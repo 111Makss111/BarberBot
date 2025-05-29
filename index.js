@@ -30,7 +30,13 @@ bot.on("polling_error", (error) => {
     process.exit(1);
   }
 });
-
+const PORT = process.env.PORT || 3000;
+http
+  .createServer((req, res) => {
+    res.writeHead(200);
+    res.end("Bot is running");
+  })
+  .listen(PORT);
 // bot.on("polling_error", (error) => {
 //   console.error(
 //     "Polling error:",

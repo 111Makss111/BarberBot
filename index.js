@@ -24,12 +24,11 @@ showTimeSelector(bot);
 handleReminders(bot);
 cleanOldRecords();
 // Ловимо помилки
-require("http")
-  .createServer((req, res) => {
-    res.writeHead(200);
-    res.end("I'm alive!");
-  })
-  .listen(process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});
+
 // bot.on("polling_error", (error) => {
 //   console.error(
 //     "Polling error:",

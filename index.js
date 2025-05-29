@@ -7,11 +7,15 @@ const bodyParser = require("body-parser");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const URL = process.env.RENDER_EXTERNAL_URL; // обов’язково додай у .env
 
-// 1. Ініціалізація бота без polling (для Webhook або кастомного polling)
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+// 1. Створюємо бота БЕЗ polling
+const bot = new TelegramBot(process.env.BOT_TOKEN);
 
-// 2. Обгортка sendMessage для обробки помилки 429 (Too Many Requests)
+// 2. Webhook для Render
+bot.setWebHook(`${URL}/webhook`);
+
+// 3. Обгортка sendMessage (обробка 429)
 const originalSendMessage = bot.sendMessage.bind(bot);
 bot.sendMessage = async function (chatId, text, options = {}) {
   try {
@@ -33,7 +37,7 @@ bot.sendMessage = async function (chatId, text, options = {}) {
   }
 };
 
-// 3. Імпорти модулів
+// 4. Імпорти логіки
 const { startCommand } = require("./keyboard/mainMenu.js");
 const handleRecord = require("./handlers/handleRecord.js");
 const handleMyAccount = require("./handlers/handleMyAccount.js");
@@ -42,7 +46,7 @@ const cleanOldRecords = require("./utils/cleanOldRecords");
 const { showTimeSelector } = require("./utils/timeSelector.js");
 const handleReminders = require("./handlers/handleReminders.js");
 
-// 4. Запуск обробників
+// 5. Реєстрація обробників
 startCommand(bot);
 handleRecord(bot);
 handleMyAccount(bot);
@@ -51,21 +55,20 @@ showTimeSelector(bot);
 handleReminders(bot);
 cleanOldRecords();
 
-// 5. Express Web сервер для Render (не дублює порт)
+// 6. Express Webhook
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  res.send("Бот працює! ✅");
-});
-
 app.post("/webhook", (req, res) => {
-  console.log("📨 Отримано повідомлення від Telegram:", req.body);
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
 
+app.get("/", (req, res) => {
+  res.send("Бот працює через Webhook 🚀");
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущено на порту ${PORT}`);
+  console.log(`Сервер запущено на порту ${PORT}`);
 });
 
 // bot.on("polling_error", (error) => {

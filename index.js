@@ -10,10 +10,10 @@ const URL =
   process.env.RENDER_EXTERNAL_URL || `https://твоє-доменне-ім’я.onrender.com`;
 const PORT = process.env.PORT || 3000;
 
-const bot = new TelegramBot(TOKEN, { webHook: { port: PORT } });
-bot.setWebHook(`${URL}/bot${TOKEN}`); // URL для webhook
+const bot = new TelegramBot(TOKEN); // ⬅️ без { webHook: { port } }
+bot.setWebHook(`${URL}/bot${TOKEN}`);
 
-// Підключення логіки бота
+// Підключення логіки
 const { startCommand } = require("./keyboard/mainMenu.js");
 const handleRecord = require("./handlers/handleRecord.js");
 const handleMyAccount = require("./handlers/handleMyAccount.js");
@@ -22,7 +22,6 @@ const cleanOldRecords = require("./utils/cleanOldRecords");
 const { showTimeSelector } = require("./utils/timeSelector.js");
 const handleReminders = require("./handlers/handleReminders.js");
 
-// Викликаємо логіку
 startCommand(bot);
 handleRecord(bot);
 createInlineCalendar(bot);
@@ -30,11 +29,9 @@ showTimeSelector(bot);
 handleReminders(bot);
 cleanOldRecords();
 
-// Сервер Express
 const app = express();
 app.use(bodyParser.json());
 
-// Webhook route для Telegram
 app.post(`/bot${TOKEN}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
@@ -44,8 +41,10 @@ app.get("/", (req, res) => {
   res.send("Бот працює через webhook ✅");
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Сервер запущено на порту ${PORT}`);
+  // Можна ще раз явно задати webhook
+  await bot.setWebHook(`${URL}/bot${TOKEN}`);
 });
 
 // bot.on("polling_error", (error) => {

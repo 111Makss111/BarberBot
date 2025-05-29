@@ -10,7 +10,12 @@ const { createInlineCalendar } = require("./utils/showCalendar.js");
 const cleanOldRecords = require("./utils/cleanOldRecords");
 const { showTimeSelector } = require("./utils/timeSelector.js");
 const handleReminders = require("./handlers/handleReminders.js");
-
+require("http")
+  .createServer((req, res) => {
+    res.writeHead(200);
+    res.end("I'm alive!");
+  })
+  .listen(process.env.PORT || 3000);
 // Запускаємо функції
 startCommand(bot);
 handleRecord(bot);
@@ -25,13 +30,13 @@ require("http")
     res.end("I'm alive!");
   })
   .listen(process.env.PORT || 3000);
-bot.on("polling_error", (error) => {
-  console.error(
-    "Polling error:",
-    error.code,
-    error.response?.body || error.message
-  );
-});
+// bot.on("polling_error", (error) => {
+//   console.error(
+//     "Polling error:",
+//     error.code,
+//     error.response?.body || error.message
+//   );
+// });
 
 // bot.onText(/\/start/, (msg) => {
 //   const userId = msg.from.id;

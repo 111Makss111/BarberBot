@@ -19,14 +19,25 @@ showTimeSelector(bot);
 handleReminders(bot);
 cleanOldRecords();
 // Ловимо помилки
-
 bot.on("polling_error", (error) => {
   console.error(
     "Polling error:",
     error.code,
     error.response?.body || error.message
   );
+  if (error.code === "ETELEGRAM" && error.response?.error_code === 409) {
+    console.error("Another instance is running. Exiting process.");
+    process.exit(1);
+  }
 });
+
+// bot.on("polling_error", (error) => {
+//   console.error(
+//     "Polling error:",
+//     error.code,
+//     error.response?.body || error.message
+//   );
+// });
 
 // bot.onText(/\/start/, (msg) => {
 //   const userId = msg.from.id;
